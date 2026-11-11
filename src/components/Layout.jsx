@@ -9,26 +9,15 @@ function navClass({ isActive }) {
 }
 
 export default function Layout({ children }) {
-  const { name, signOut, unlockAll, setUnlockAll } = useWho()
+  const { name, signOut } = useWho()
 
   return (
     <div className="page">
       <nav className="topbar">
         <NavLink className={navClass} to="/" end>Calendar</NavLink>
-        <NavLink className={navClass} to="/my-days">My days</NavLink>
+        <NavLink className={navClass} to="/editor">Editor</NavLink>
 
         <span className="topbar__right">
-          {import.meta.env.DEV && (
-            <label className="topbar__test" title="Testing only — never in the published site">
-              <input
-                type="checkbox"
-                checked={unlockAll}
-                onChange={(event) => setUnlockAll(event.target.checked)}
-              />
-              unlock all
-            </label>
-          )}
-
           <span className="topbar__who">{name}</span>
           <button className="topbar__button" type="button" onClick={signOut}>
             Not you?

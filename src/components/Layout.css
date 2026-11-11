@@ -40,17 +40,3 @@
   text-decoration: none;
 }
 
-/* Testing switch. Only rendered while running npm run dev. */
-.topbar__test {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  color: #555555;
-  cursor: pointer;
-  user-select: none;
-}
-
-.topbar__test input {
-  margin: 0;
-  cursor: pointer;
-}

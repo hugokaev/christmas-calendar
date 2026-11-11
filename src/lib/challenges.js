@@ -76,7 +76,7 @@ export async function fetchSecret(day) {
   return toSecret(data)
 }
 
-// Everything saved so far, for the "My days" list.
+// Everything saved so far.
 export async function fetchAllSecrets() {
   const { data } = await read((columns) =>
     supabase.from('challenges').select(columns).order('day'),

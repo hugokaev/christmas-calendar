@@ -23,7 +23,7 @@
 //   secret     { title, instructions, data } or null
 //   isPreview  true when you are testing it before the date
 //
-// `secret` is whatever you saved in the editor under "My days" — handy
+// `secret` is whatever you saved under Editor -> the date -> Edit
 // for things you want to change without editing this file. Nothing on
 // this site is private: there are no passwords, so anyone using it can
 // read what you save there.

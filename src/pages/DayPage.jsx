@@ -5,7 +5,6 @@
 import { useParams } from 'react-router-dom'
 import { isUnlockedOn } from '../lib/dates.js'
 import { useServerDate } from '../lib/useServerDate.js'
-import { useWho } from '../lib/WhoContext.jsx'
 import { FIRST_DAY, LAST_DAY } from '../config.js'
 import DayCanvas from '../components/DayCanvas.jsx'
 import BackArrow from '../components/BackArrow.jsx'
@@ -16,7 +15,6 @@ export default function DayPage() {
   const { day: dayParam } = useParams()
   const day = Number(dayParam)
 
-  const { unlockAll } = useWho()
   const { serverDate, loading, error } = useServerDate()
 
   const validDay = Number.isInteger(day) && day >= FIRST_DAY && day <= LAST_DAY
@@ -54,7 +52,7 @@ export default function DayPage() {
     )
   }
 
-  if (!unlockAll && !isUnlockedOn(day, serverDate)) {
+  if (!isUnlockedOn(day, serverDate)) {
     return (
       <>
         <BackArrow />

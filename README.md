@@ -94,7 +94,7 @@ way; a full-bleed background is just as valid.
 register it in, which is deliberate — it means you and Gabriel can both
 add days and Git will never make you resolve a conflict.
 
-**4. Preview it** at **My days → the date**, any time before it unlocks.
+**4. Open it** from the **Editor** tab, any time before it unlocks.
 
 Your component is handed four things:
 
@@ -123,17 +123,14 @@ refreshing the page.
 
 ## Seeing a day before its date
 
-While `npm run dev` is running there is an **unlock all** tickbox in the
-top bar. Tick it and every date becomes clickable, so you can see a day
-exactly as it will look on the morning it opens. Untick it to get the
-real locked behaviour back.
+The **Editor** tab shows the same month grid as the calendar, with one
+difference: the dates you can open are **your own**, whatever today's
+date is. Gabriel's are greyed out, and his editor is the mirror image.
 
-It is remembered per browser, and it exists **only in development** —
-`npm run build` strips it out, so it cannot be switched on by anyone
-using the published site.
+Click one of your dates and you get that day exactly as it will look on
+the morning, plus a link to its saved content.
 
-There is also **My days → a date**, which previews just your own days
-with a "Preview" bar at the top.
+The main **Calendar** tab always enforces real dates, for both of you.
 
 ---
 
@@ -289,8 +286,7 @@ between a stranger and your calendar. There are no passwords.
 - `vite.config.js` has `base: '/'` because Vercel serves from the root of
   a domain. If you ever move to GitHub Pages instead, that has to become
   `'/christmas-calendar/'` or nothing will load.
-- The **unlock all** testing tickbox does not exist in the published
-  site. Days there really do open on their date.
+- Days open on their real date, everywhere. There is no override.
 
 ---
 
@@ -346,6 +342,6 @@ src/
     CalendarPage.jsx     The month
     DayPage.jsx          A day, once it has unlocked
     PreviewPage.jsx      Testing your own day early
-    MyDaysPage.jsx       Your dates, and what still needs building
-    EditDayPage.jsx      Content for one of your days
+    EditorPage.jsx       The same grid, but your own dates open
+    EditDayPage.jsx      Saved content for one of your days
 ```

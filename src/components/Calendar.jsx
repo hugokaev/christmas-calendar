@@ -1,13 +1,17 @@
-// The calendar: a heading, the weekday names, and the grid of days.
+// The month grid.
+//
+// Used by two pages that look identical but open different things:
+//
+//   Calendar page — dates you can open are the ones that have unlocked
+//   Editor page   — dates you can open are the ones you write
+//
+// Both are told which dates are openable, and where a date leads.
 import { buildMonthGrid, getMonthName, WEEKDAY_NAMES } from '../calendar.js'
-import { isUnlockedOn } from '../lib/dates.js'
-import { useWho } from '../lib/WhoContext.jsx'
 import { YEAR, MONTH, LAST_DAY } from '../config.js'
 import DayCell from './DayCell.jsx'
 import './Calendar.css'
 
-export default function Calendar({ serverDate }) {
-  const { unlockAll } = useWho()
+export default function Calendar({ canOpen, linkTo }) {
   const cells = buildMonthGrid(YEAR, MONTH, LAST_DAY)
 
   return (
@@ -27,7 +31,8 @@ export default function Calendar({ serverDate }) {
           <DayCell
             key={index}
             day={day}
-            unlocked={day !== null && (unlockAll || isUnlockedOn(day, serverDate))}
+            open={day !== null && canOpen(day)}
+            to={day !== null ? linkTo(day) : null}
           />
         ))}
       </div>

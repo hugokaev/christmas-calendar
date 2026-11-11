@@ -7,7 +7,7 @@
 // so the wheel is identical for both of you and refreshing the page
 // cannot reroll it into something easier.
 //
-// You can override the whole thing from My days -> 1 December. Put one
+// You can override the whole thing from Editor -> 1 December. Put one
 // option per line in the Text box, or use structured data:
 //
 //   { "options": ["10 burpees", "Sing a carol"] }
@@ -128,7 +128,7 @@ export default function Day01({ day = 1, secret }) {
   return (
     <article className="day01">
       {/* Nothing is shown unless you put it here. A title only appears
-          if you have saved one under My days. */}
+          if you have saved one under Editor -> 1 December. */}
       {secret?.title && <h2 className="day01__title">{secret.title}</h2>}
 
       {options.length < 2 ? (

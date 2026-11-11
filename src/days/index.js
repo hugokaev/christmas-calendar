@@ -26,7 +26,7 @@ export function getDayComponent(day) {
 }
 
 // Has someone built a custom page for this day yet?
-// Used by "My days" to tell you which file to create next.
+// Not used by the site itself; handy when working out what is built.
 export function hasCustomPage(day) {
   return Boolean(customDays[day])
 }

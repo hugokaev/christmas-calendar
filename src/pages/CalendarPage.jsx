@@ -1,11 +1,9 @@
-// The main calendar view.
-//
-// Anything dropped into src/extras/top or src/extras/bottom appears
-// around the calendar automatically.
+// The main calendar. Dates open once they have unlocked.
 import Calendar from '../components/Calendar.jsx'
 import Extras from '../components/Extras.jsx'
 import Notice from '../components/Notice.jsx'
 import { useServerDate } from '../lib/useServerDate.js'
+import { isUnlockedOn } from '../lib/dates.js'
 
 export default function CalendarPage() {
   const { serverDate, loading, error } = useServerDate()
@@ -19,7 +17,12 @@ export default function CalendarPage() {
   return (
     <>
       <Extras slot="top" />
-      <Calendar serverDate={serverDate} />
+
+      <Calendar
+        canOpen={(day) => isUnlockedOn(day, serverDate)}
+        linkTo={(day) => `/day/${day}`}
+      />
+
       <Extras slot="bottom" />
     </>
   )

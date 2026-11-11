@@ -133,7 +133,7 @@ export default function EditDayPage() {
             : 'Your account has no days assigned yet.'}
         </Notice>
         <p className="editday__links">
-          <Link to="/my-days">Back to my days</Link>
+          <Link to="/editor">Back to the editor</Link>
         </p>
       </>
     )
@@ -218,9 +218,9 @@ export default function EditDayPage() {
       )}
 
       <p className="editday__links">
-        <Link to={`/preview/${day}`}>Preview this day</Link>
+        <Link to={`/preview/${day}`}>Preview</Link>
         {' · '}
-        <Link to="/my-days">Back to my days</Link>
+        <Link to="/editor">Back to the editor</Link>
       </p>
     </section>
   )

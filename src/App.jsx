@@ -12,7 +12,7 @@ import Layout from './components/Layout.jsx'
 import Notice from './components/Notice.jsx'
 import CalendarPage from './pages/CalendarPage.jsx'
 import DayPage from './pages/DayPage.jsx'
-import MyDaysPage from './pages/MyDaysPage.jsx'
+import EditorPage from './pages/EditorPage.jsx'
 import PreviewPage from './pages/PreviewPage.jsx'
 import EditDayPage from './pages/EditDayPage.jsx'
 
@@ -22,8 +22,8 @@ function Framed() {
     <Layout>
       <Routes>
         <Route path="/" element={<CalendarPage />} />
-        <Route path="/my-days" element={<MyDaysPage />} />
-        <Route path="/my-days/:day" element={<EditDayPage />} />
+        <Route path="/editor" element={<EditorPage />} />
+        <Route path="/editor/:day" element={<EditDayPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

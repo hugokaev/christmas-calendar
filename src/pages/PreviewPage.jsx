@@ -23,7 +23,7 @@ export default function PreviewPage() {
   if (!validDay) {
     return (
       <>
-        <BackArrow to="/my-days" />
+        <BackArrow to="/editor" />
         <div className="daywrap">
           <Notice kind="error">No day {dayParam}.</Notice>
         </div>
@@ -34,7 +34,7 @@ export default function PreviewPage() {
   if (!isMine) {
     return (
       <>
-        <BackArrow to="/my-days" />
+        <BackArrow to="/editor" />
         <div className="daywrap">
           <Notice kind="error">
             {parity ? `Day ${day} is not one of yours.` : 'No dates assigned.'}
@@ -46,7 +46,7 @@ export default function PreviewPage() {
 
   return (
     <>
-      <BackArrow to="/my-days" />
+      <BackArrow to="/editor" />
       <DayCanvas day={day} isPreview />
     </>
   )
