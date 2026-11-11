@@ -66,6 +66,64 @@ will not show the page.
 
 ---
 
+## Joining the project (Gabriel, start here)
+
+**1. Accept the invite.** GitHub emails you one; there is also a banner
+at the top of the repository page.
+
+**2. Install [Node.js](https://nodejs.org) 18 or newer.** Check with
+`node -v`. On a Mac with [Homebrew](https://brew.sh): `brew install node`.
+
+**3. Get the code:**
+
+```bash
+git clone https://github.com/hugokaev/christmas-calendar.git
+```
+
+```bash
+cd christmas-calendar && npm install
+```
+
+**4. Ask Hugo for the two Supabase values.** They are deliberately NOT in
+this repository — that is what `.env.local` being git-ignored means. Make
+a file called `.env.local` in the project folder:
+
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
+
+Without it the site just shows "Supabase is not connected yet".
+
+You do **not** need a Supabase account of your own. The two values are
+all that is required.
+
+**5. Run it:**
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173/christmas-calendar/ and type **gabriel**.
+
+**6. Your dates are the even ones** — 2, 4, 6 … 24. The **Editor** tab
+shows them as the clickable squares. Hugo's are greyed out there, and
+his editor is the mirror image.
+
+### Working at the same time
+
+`git pull` before you start, push when you are done.
+
+Because every day is its own file and nothing registers them in a shared
+list, you two can both add days and Git will merge it without conflicts.
+The same goes for `src/extras/`.
+
+One thing to know: if the site is connected to Vercel, pushing to `main`
+puts your work online within about a minute. A half-finished day goes
+live as soon as you push it.
+
+---
+
 ## Building a day page
 
 This is the main thing you will do.
