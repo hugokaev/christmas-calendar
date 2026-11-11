@@ -1,0 +1,60 @@
+/*
+  One day square.
+  aspect-ratio keeps every square the same shape as the screen gets wider.
+  The white background covers the black grid behind it, leaving only
+  the 1px gaps showing as lines.
+*/
+.day {
+  background: #ffffff;
+  aspect-ratio: 1 / 1;
+  padding: 4px;
+  min-height: 44px;
+}
+
+/* A padding square before the 1st or after the 31st. */
+.day--empty {
+  background: #ffffff;
+}
+
+/* The date number, sitting in the top-left corner. */
+.day__number {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+@media (min-width: 700px) {
+  .day {
+    padding: 8px;
+    min-height: 72px;
+  }
+
+  .day__number {
+    font-size: 0.9375rem;
+  }
+}
+
+/*
+  A day that has not unlocked yet. Still just a number, only quieter,
+  so it is obvious which squares can be opened.
+*/
+.day--locked .day__number {
+  color: #9b9b9b;
+}
+
+/* A day that has unlocked, and is therefore a link. */
+.day--open {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.day--open:hover,
+.day--open:focus-visible {
+  background: #f2f2f2;
+}
+
+/* Locked squares are not clickable, so do not pretend otherwise. */
+.day--locked {
+  cursor: default;
+}

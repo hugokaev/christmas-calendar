@@ -1,0 +1,72 @@
+/* Day 1 only. Class names are prefixed so nothing here can affect
+   Gabriel's days or the rest of the site.
+
+   A day page gets no padding from the site, so this file sets its own.
+   Change it to whatever you like — full-bleed background, centred,
+   anything. */
+
+.day01 {
+  padding: 48px 16px 32px;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.day01__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+.day01__empty {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #555555;
+  max-width: 30rem;
+}
+
+.day01__stage {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 0 20px;
+}
+
+/* The little triangle at the top that marks the winning slice. */
+.day01__pointer {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 16px solid #000000;
+  z-index: 1;
+}
+
+.day01__wheel {
+  transition: transform 3.4s cubic-bezier(0.17, 0.67, 0.21, 1);
+}
+
+.day01__wheel svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.day01__spin {
+  margin-bottom: 12px;
+}
+
+.day01__result {
+  font-size: 0.9375rem;
+  margin: 0;
+  min-height: 1.5em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day01__wheel {
+    transition: none;
+  }
+}

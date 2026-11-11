@@ -1,0 +1,19 @@
+.notice {
+  margin: 16px 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.notice--info {
+  color: #555555;
+}
+
+.notice--error {
+  color: #000000;
+  border: 1px solid #000000;
+  padding: 10px 12px;
+}
+
+.notice--success {
+  color: #555555;
+}

@@ -1,0 +1,20 @@
+.nameprompt {
+  max-width: 320px;
+}
+
+.nameprompt__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.nameprompt__intro {
+  font-size: 0.875rem;
+  color: #555555;
+  margin: 0 0 20px;
+}
+
+.nameprompt__form {
+  display: grid;
+  gap: 14px;
+}

@@ -1,0 +1,44 @@
+/* The month heading. */
+.calendar__title {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/*
+  The grid is 7 equal columns: Monday to Sunday.
+  The 1px gap sits on a black background, which is what draws
+  the thin lines between the squares.
+*/
+.calendar__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: #000000;
+  border: 1px solid #000000;
+}
+
+/* The weekday names across the top. */
+.calendar__weekday {
+  background: #ffffff;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 700px) {
+  .calendar__title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+
+  .calendar__weekday {
+    padding: 10px 6px;
+    font-size: 0.75rem;
+  }
+}
+

@@ -1,0 +1,36 @@
+.editday {
+  max-width: 34rem;
+}
+
+.editday__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.editday__form {
+  display: grid;
+  gap: 14px;
+}
+
+.editday__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.editday__dirty {
+  font-size: 0.8125rem;
+  color: #555555;
+}
+
+.editday__links {
+  margin-top: 28px;
+  font-size: 0.8125rem;
+}
+
+.field__textarea--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  min-height: 120px;
+}

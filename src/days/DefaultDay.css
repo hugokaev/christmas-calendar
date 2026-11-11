@@ -1,0 +1,18 @@
+.defaultday {
+  padding: 48px 16px 32px;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.defaultday__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+/* white-space: pre-wrap keeps the line breaks as typed. */
+.defaultday__body {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

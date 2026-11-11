@@ -1,0 +1,10 @@
+/*
+  Used only for the site's own messages on a day route — loading,
+  an error, or a locked day. A real day page gets none of this: it is
+  handed the bare page and styles itself from its own CSS file.
+*/
+.daywrap {
+  padding: 48px 16px 16px;
+  max-width: 34rem;
+  margin: 0 auto;
+}

@@ -1,0 +1,7 @@
+.boundary {
+  border: 1px solid #000000;
+  padding: 10px 12px;
+  margin: 12px 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}

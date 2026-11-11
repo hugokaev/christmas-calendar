@@ -1,0 +1,56 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  font-size: 0.8125rem;
+}
+
+.topbar__link {
+}
+
+.topbar__right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar__who {
+  color: #555555;
+}
+
+.topbar__button {
+  font: inherit;
+  color: #000000;
+  background: none;
+  border: 1px solid #000000;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.topbar__button:hover {
+  background: #f2f2f2;
+}
+
+/* The page you are looking at right now. */
+.topbar__link--here {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Testing switch. Only rendered while running npm run dev. */
+.topbar__test {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #555555;
+  cursor: pointer;
+  user-select: none;
+}
+
+.topbar__test input {
+  margin: 0;
+  cursor: pointer;
+}

@@ -1,0 +1,64 @@
+.mydays__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.mydays__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #000000;
+  max-width: 40rem;
+}
+
+.mydays__item {
+  display: grid;
+  grid-template-columns: 9rem 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 2px;
+  border-bottom: 1px solid #000000;
+  font-size: 0.875rem;
+}
+
+.mydays__day a {
+}
+
+.mydays__live {
+  color: #555555;
+  font-size: 0.8125rem;
+}
+
+.mydays__built {
+  font-size: 0.8125rem;
+  color: #555555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mydays__todo {
+  color: #9b9b9b;
+}
+
+.mydays__secret {
+  font-size: 0.8125rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mydays__item code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+@media (max-width: 620px) {
+  .mydays__item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .mydays__secret {
+    text-align: left;
+  }
+}

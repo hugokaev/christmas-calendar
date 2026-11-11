@@ -1,0 +1,72 @@
+/* Shared form styling, used by the name prompt and the day editor. */
+
+.field {
+  display: grid;
+  gap: 5px;
+}
+
+.field__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.field__input,
+.field__textarea {
+  font: inherit;
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #000000;
+  padding: 7px 9px;
+  width: 100%;
+}
+
+.field__textarea {
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field__hint {
+  font-size: 0.75rem;
+  color: #555555;
+}
+
+.field__hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: #f2f2f2;
+  padding: 1px 4px;
+}
+
+.button {
+  font: inherit;
+  color: #000000;
+  background: #ffffff;
+  border: 1px solid #000000;
+  padding: 7px 14px;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.button:hover:not(:disabled) {
+  background: #f2f2f2;
+}
+
+.button:disabled {
+  color: #9b9b9b;
+  border-color: #9b9b9b;
+  cursor: default;
+}
+
+.linkbutton {
+  font: inherit;
+  font-size: inherit;
+  color: #000000;
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
