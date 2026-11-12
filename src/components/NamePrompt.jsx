@@ -25,7 +25,7 @@ const ANGRY_FOR_MS = 2500 // pointing, after the FAKE line finishes
 
 // Any of these first names with either surname sets him off. Capitals and
 // extra spaces are ignored before this is checked.
-const WASHROOM = /^(ladies|ladiz|ladees|ladise) (washroom|washrum)$/
+const WASHROOM = /^(ladies|ladiz|ladees|ladise|ladis) (washroom|washrum)$/
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
