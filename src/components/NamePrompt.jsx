@@ -23,6 +23,10 @@ const FIRST_DELAY_MS = 400 // before the frog starts asking
 const PAUSE_BEFORE_EXIT_MS = 700 // after "Enter <name>..." finishes
 const ANGRY_FOR_MS = 2500 // pointing, after the FAKE line finishes
 
+// Any of these first names with either surname sets him off. Capitals and
+// extra spaces are ignored before this is checked.
+const WASHROOM = /^(ladies|ladiz|ladees|ladise) (washroom|washrum)$/
+
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -105,9 +109,10 @@ export default function NamePrompt() {
 
     const cleaned = typed.trim().toLowerCase().replace(/\s+/g, ' ')
 
-    setAngry(cleaned === 'ladies washroom')
+    const washroom = WASHROOM.test(cleaned)
+    setAngry(washroom)
 
-    if (cleaned === 'ladies washroom') {
+    if (washroom) {
       say(FAKE)
     } else {
       const found = matchPerson(typed)
