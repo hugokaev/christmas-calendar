@@ -1,20 +1,95 @@
+/* The whole screen, so the frog can slide off the edge without
+   making the page scroll sideways. */
 .nameprompt {
-  max-width: 320px;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px;
 }
 
-.nameprompt__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 8px;
+/* The drawing plus the words in his bubble. Text sizes use cqw so the
+   words stay inside the bubble at any screen width. */
+.nameprompt__frog {
+  position: relative;
+  width: min(100%, 628px, 60vh);
+  container-type: inline-size;
 }
 
-.nameprompt__intro {
-  font-size: 0.875rem;
-  color: #555555;
-  margin: 0 0 20px;
+.nameprompt__frog--leaving {
+  /* Ease-in: starts slow, keeps speeding up until he's gone. */
+  animation: nameprompt-exit 1.4s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+@keyframes nameprompt-exit {
+  to {
+    transform: translateX(calc(100vw + 100%));
+  }
+}
+
+.nameprompt__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+/* Sits inside the oval of the speech bubble in the drawing. */
+.nameprompt__bubble {
+  position: absolute;
+  left: 50%;
+  top: 10.5%;
+  width: 41%;
+  height: 25.5%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', cursive;
+  font-size: 3.6cqw;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.nameprompt__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .nameprompt__form {
   display: grid;
   gap: 14px;
+  width: min(100%, 320px);
+}
+
+/* The black screen between the frog and the calendar. */
+.nameprompt-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nameprompt__frog--leaving {
+    animation: nameprompt-exit-quiet 0.4s ease-out forwards;
+  }
+
+  @keyframes nameprompt-exit-quiet {
+    to {
+      opacity: 0;
+    }
+  }
 }
