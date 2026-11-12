@@ -13,12 +13,19 @@
   padding: 16px;
 }
 
-/* The drawing plus the words in his bubble. Text sizes use cqw so the
-   words stay inside the bubble at any screen width. */
-.nameprompt__frog {
+/* The whole drawing: washroom, frog, bubble. Every layer is the same
+   1176 x 712 picture stacked exactly on top of the others. Text sizes use
+   cqw so the words stay inside the bubble at any screen width. */
+.nameprompt__scene {
   position: relative;
-  width: min(100%, 628px, 60vh);
+  width: min(100%, 1176px, calc(62vh * 1176 / 712));
+  aspect-ratio: 1176 / 712;
   container-type: inline-size;
+}
+
+.nameprompt__frog {
+  position: absolute;
+  inset: 0;
 }
 
 .nameprompt__frog--leaving {
@@ -32,27 +39,32 @@
   }
 }
 
-.nameprompt__image {
-  display: block;
+.nameprompt__layer {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
   user-select: none;
+}
+
+.nameprompt__layer[hidden] {
+  display: none;
 }
 
 /* Sits inside the oval of the speech bubble in the drawing. */
 .nameprompt__bubble {
   position: absolute;
-  left: 50%;
-  top: 10.5%;
-  width: 41%;
-  height: 25.5%;
+  left: 26.9%;
+  top: 9.3%;
+  width: 21.9%;
+  height: 21.9%;
   margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   font-family: 'Comic Sans MS', 'Comic Neue', 'Chalkboard SE', cursive;
-  font-size: 3.6cqw;
+  font-size: max(9px, 1.92cqw);
   line-height: 1.25;
   overflow-wrap: anywhere;
 }

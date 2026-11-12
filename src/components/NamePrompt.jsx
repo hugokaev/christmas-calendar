@@ -7,7 +7,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useWho } from '../lib/WhoContext.jsx'
 import { matchPerson } from '../people.js'
-import frog from '../assets/frog-security.png'
+// Three same-size, transparent layers that stack exactly on top of each
+// other: the washroom (always there), and the frog calm or pointing.
+import washroom from '../assets/ladies-washroom.png'
+import frogCalm from '../assets/frog-normal.png'
+import frogAngry from '../assets/frog-angry.png'
 import './NamePrompt.css'
 
 const ASK = 'what is your name?'
@@ -17,6 +21,7 @@ const FAKE = 'that is a FAKE name. what is your REAL name'
 const TYPE_SPEED_MS = 55 // per letter
 const FIRST_DELAY_MS = 400 // before the frog starts asking
 const PAUSE_BEFORE_EXIT_MS = 700 // after "Enter <name>..." finishes
+const ANGRY_FOR_MS = 2500 // pointing, after the FAKE line finishes
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
@@ -85,6 +90,7 @@ export default function NamePrompt() {
   const [bubble, setBubble] = useState({ text: ASK, nonce: 0, delay: FIRST_DELAY_MS })
   const [entering, setEntering] = useState(null) // the matched person
   const [leaving, setLeaving] = useState(false)
+  const [angry, setAngry] = useState(false)
   const inputRef = useRef(null)
 
   const { shown, done } = useTypewriter(bubble.text, bubble.nonce, bubble.delay)
@@ -98,6 +104,8 @@ export default function NamePrompt() {
     if (entering) return
 
     const cleaned = typed.trim().toLowerCase().replace(/\s+/g, ' ')
+
+    setAngry(cleaned === 'ladies washroom')
 
     if (cleaned === 'ladies washroom') {
       say(FAKE)
@@ -122,6 +130,14 @@ export default function NamePrompt() {
     return () => clearTimeout(timer)
   }, [entering, done])
 
+  // He points at the washroom until he has finished telling you off,
+  // holds it a moment, then calms down.
+  useEffect(() => {
+    if (!angry || !done) return
+    const timer = setTimeout(() => setAngry(false), ANGRY_FOR_MS)
+    return () => clearTimeout(timer)
+  }, [angry, done, bubble.nonce])
+
   function handleExitFinished(event) {
     if (event.target !== event.currentTarget || !entering) return
     fadeThroughBlack(() => signIn(entering.key))
@@ -129,22 +145,40 @@ export default function NamePrompt() {
 
   return (
     <section className="nameprompt">
-      <div
-        className={leaving ? 'nameprompt__frog nameprompt__frog--leaving' : 'nameprompt__frog'}
-        onAnimationEnd={handleExitFinished}
-      >
+      <div className="nameprompt__scene">
         <img
-          className="nameprompt__image"
-          src={frog}
-          alt="A frog in a FROG SECURITY uniform, with a speech bubble"
+          className="nameprompt__layer"
+          src={washroom}
+          alt="A building labelled Ladies Washroom"
           draggable={false}
         />
-        <p className="nameprompt__bubble" aria-live="polite">
-          <span className="nameprompt__said" aria-hidden="true">
-            {shown}
-          </span>
-          <span className="nameprompt__sr">{done ? bubble.text : ''}</span>
-        </p>
+
+        <div
+          className={leaving ? 'nameprompt__frog nameprompt__frog--leaving' : 'nameprompt__frog'}
+          onAnimationEnd={handleExitFinished}
+        >
+          {/* Both are always loaded so the swap never flickers. */}
+          <img
+            className="nameprompt__layer"
+            src={frogCalm}
+            alt="A frog in a FROG SECURITY uniform, with a speech bubble"
+            hidden={angry}
+            draggable={false}
+          />
+          <img
+            className="nameprompt__layer"
+            src={frogAngry}
+            alt="The frog, furious, pointing a very long arm at the Ladies Washroom"
+            hidden={!angry}
+            draggable={false}
+          />
+          <p className="nameprompt__bubble" aria-live="polite">
+            <span className="nameprompt__said" aria-hidden="true">
+              {shown}
+            </span>
+            <span className="nameprompt__sr">{done ? bubble.text : ''}</span>
+          </p>
+        </div>
       </div>
 
       <form className="nameprompt__form" onSubmit={handleSubmit}>
