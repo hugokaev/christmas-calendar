@@ -1,72 +1,789 @@
-/* Day 1 only. Class names are prefixed so nothing here can affect
+/* Day 1 only. Every class is prefixed day01__ so nothing here can reach
    Gabriel's days or the rest of the site.
 
-   A day page gets no padding from the site, so this file sets its own.
-   Change it to whatever you like — full-bleed background, centred,
-   anything. */
+   A day page gets no padding or background from the site, so this file
+   paints the whole screen: sky from CSS, landscape from the SVG, snow
+   on a canvas over the top. */
 
 .day01 {
-  padding: 48px 16px 32px;
-  max-width: 34rem;
-  margin: 0 auto;
+  --cream: #fffaf0;
+  --candy: #c0493f;
+  --pine: #4a7058;
+  --night: #24406f;
+
+  /* A friendly rounded face where the system has one. */
+  font-family: ui-rounded, 'SF Pro Rounded', 'Segoe UI Rounded', 'Nunito',
+    system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: var(--cream);
+  background: linear-gradient(180deg, #080c22 0%, #0e1430 55%, #141d3f 100%);
 }
 
-.day01__title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0 0 20px;
+/* The back arrow belongs to the site, not this day, but this day has a
+   dark sky — so make it readable while day 1 is on screen. */
+body:has(.day01) .backarrow {
+  color: var(--cream, #fffaf0);
+  font-size: 1.5rem;
 }
 
-.day01__empty {
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: #555555;
-  max-width: 30rem;
+body:has(.day01) .backarrow:hover,
+body:has(.day01) .backarrow:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
 }
 
-.day01__stage {
-  position: relative;
+
+/* ── Snow ─────────────────────────────────────────────────────────── */
+
+.day01__snow {
+  position: fixed;
+  inset: 0;
   width: 100%;
-  max-width: 300px;
-  margin: 0 0 20px;
+  height: 100%;
+  z-index: 4;           /* over everything, including the doors */
+  pointer-events: none; /* so it never swallows a tap */
 }
 
-/* The little triangle at the top that marks the winning slice. */
-.day01__pointer {
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 16px solid #000000;
-  z-index: 1;
-}
+/* ── The landscape ────────────────────────────────────────────────── */
 
-.day01__wheel {
-  transition: transform 3.4s cubic-bezier(0.17, 0.67, 0.21, 1);
-}
-
-.day01__wheel svg {
-  display: block;
+.day01__scene {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: auto;
+  z-index: 1;
+  filter: drop-shadow(0 -6px 30px rgba(12, 28, 56, 0.25));
 }
 
-.day01__spin {
-  margin-bottom: 12px;
+/* ── The hidden candy canes ───────────────────────────────────────── */
+
+/* Only the candy canes are clickable. Blurred decoration — rim light,
+   shadows, bloom — has a filter region far larger than the shape, and
+   it was swallowing clicks meant for a cane behind it. */
+.day01__scene {
+  pointer-events: none;
 }
 
-.day01__result {
-  font-size: 0.9375rem;
+
+
+
+/* A glow on hover rather than a transform — the canes are positioned
+   with a transform attribute, and a CSS transform would overwrite it
+   and send them flying. */
+
+.day01--opening .day01__inside,
+.day01--outside .day01__inside {
+  opacity: 1;
+  transform: none;
+}
+
+/* …but the card itself is interactive again. */
+.day01__unlocked,
+
+.day01__prompt {
+  margin: 0 0 14px;
+  font-size: clamp(1.375rem, 5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 2px rgba(26, 30, 60, 0.85), 0 3px 20px rgba(20, 24, 52, 0.75);
+}
+
+
+
+
+
+
+
+
+/* ── When you have found them all ─────────────────────────────────── */
+
+
+
+.day01__cheer {
   margin: 0;
-  min-height: 1.5em;
+  font-size: clamp(1.5rem, 5.5vw, 2.25rem);
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(26, 30, 60, 0.85), 0 3px 20px rgba(20, 24, 52, 0.75);
+}
+
+
+.day01__challengetitle {
+  margin: 0 0 8px;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  color: #4a7058;
+}
+
+.day01__challenge {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ── The doors ────────────────────────────────────────────────────── */
+
+.day01__doors {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  perspective: 1500px;
+}
+
+.day01__door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%; /* a hair over half, so no seam shows */
+  overflow: hidden;
+  background: #a8403a;
+  transition: transform 1500ms cubic-bezier(0.62, 0.02, 0.2, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* The painted panel inside each door. */
+.day01__doorpaint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.day01__door--left {
+  left: 0;
+  transform-origin: left center;
+  box-shadow: inset -30px 0 50px -26px rgba(70, 16, 14, 0.9);
+}
+
+.day01__door--right {
+  right: 0;
+  transform-origin: right center;
+  box-shadow: inset 30px 0 50px -26px rgba(70, 16, 14, 0.9);
+}
+
+/* Swing outward on a hinge, like opening the little card door. */
+.day01--opening .day01__door--left { transform: rotateY(-118deg); }
+.day01--opening .day01__door--right { transform: rotateY(118deg); }
+
+.day01__plaque {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: opacity 500ms ease, transform 700ms ease;
+}
+
+.day01--opening .day01__plaque {
+  opacity: 0;
+  transform: scale(1.22);
+}
+
+.day01__numeral {
+  font-size: clamp(5.5rem, 24vw, 11rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cream);
+  text-shadow: 2px 2px 0 #f0dcc2, -2px 3px 0 #d6b396, 0 7px 0 rgba(120, 32, 28, 0.5),
+               0 16px 44px rgba(50, 8, 6, 0.45);
+}
+
+.day01__month {
+  font-size: clamp(1rem, 4vw, 1.375rem);
+  font-weight: 700;
+  color: #ffe6c8;
+}
+
+.day01__hint {
+  margin-top: 20px;
+  font-size: 0.9375rem;
+  color: rgba(255, 250, 240, 0.85);
+  animation: day01-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes day01-breathe {
+  0%, 100% { opacity: 0.45; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* ── Smaller screens ──────────────────────────────────────────────── */
+
+@media (max-width: 560px) {
+  /* On a tall phone the sky is huge, so sit the words in the middle of
+     it rather than leaving a gap between them and the landscape. */
+  .day01__inside {
+    justify-content: center;
+    padding: 80px 18px 34vh;
+  }
+
+  .day01__pip svg { width: 20px; height: 22px; }
+  .day01__card { border-radius: 18px; padding: 18px; }
+}
+
+/* ── Respect a preference for less movement ───────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .day01__inside,
+  .day01__door,
+  .day01__plaque,
+  .day01__cane,
+  .day01__pipbase,
+  .day01__pipstripe {
+    transition: none;
+  }
+
+  .day01__unlocked,
+  .day01__pip--got {
+    animation: none;
+  }
+
+  .day01__hint {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* ── The cabin door, which is the way in ──────────────────────────── */
+
+.day01__doorway {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.day01__doorhalo {
+  fill: #2a1a10;
+  stroke: #ffd98a;
+  stroke-width: 0;
+  transition: stroke-width 220ms ease, fill 220ms ease;
+}
+
+.day01__doorway:hover .day01__doorhalo,
+.day01__doorway:focus-visible .day01__doorhalo {
+  fill: #4a2f1c;
+  stroke-width: 1.6;
+}
+
+.day01__doorway:focus-visible {
+  outline: none;
+}
+
+/* A slow pulse, so it is findable without a label pointing at it. */
+.day01__doorway::after { content: none; }
+
+.day01--outside .day01__doorhalo {
+  animation: day01-knock 2.8s ease-in-out infinite;
+}
+
+@keyframes day01-knock {
+  0%, 100% { stroke-width: 0.6; }
+  50% { stroke-width: 2.2; }
+}
+
+/* ── Inside ───────────────────────────────────────────────────────── */
+
+.day01__interior {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.day01__room {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Sit the card low, over the rug, so the hearth and the tree are not
+     hidden behind it. */
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 64px 20px clamp(24px, 9vh, 76px);
+  text-align: center;
+  /* so the presents behind can be poked */
+  pointer-events: none;
+}
+
+.day01__room > * {
+  pointer-events: auto;
+}
+
+.day01__back {
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--cream);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 250, 240, 0.45);
+  border-radius: 999px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.day01__back:hover {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.day01__challengetitle {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2f6b4a;
+}
+
+.day01__challenge {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #413b33;
+}
+
+/* ── The scratch card ─────────────────────────────────────────────── */
+
+.scratch {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  min-height: 150px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fdf6ea;
+  box-shadow: 0 20px 50px rgba(12, 6, 2, 0.65), 0 0 0 3px rgba(240, 213, 140, 0.5);
+}
+
+.scratch__content {
+  padding: 26px 22px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.scratch__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none; /* so dragging scratches instead of scrolling */
+  transition: opacity 600ms ease;
+}
+
+.scratch__cover:active {
+  cursor: grabbing;
+}
+
+.scratch__cover--gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* For anyone who cannot drag. */
+.scratch__skip {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  font: inherit;
+  font-size: 0.75rem;
+  color: #6b2a24;
+  background: rgba(255, 246, 226, 0.88);
+  border: 1px solid rgba(107, 42, 36, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .day01__wheel {
+  .day01__doorhalo,
+  .scratch__cover {
     transition: none;
   }
+
+  .day01--outside .day01__doorhalo {
+    animation: none;
+    stroke-width: 1.6;
+  }
+}
+
+/* ── Magic: aurora, twinkle, glow, parallax ──────────────────────── */
+
+/* The aurora drifts and breathes. Long, out-of-step durations so it
+   never looks like it is on a loop. */
+.d1-aurora__band {
+  transform-origin: 50% 70%;
+  will-change: transform, opacity;
+}
+
+.d1-aurora__band--a { animation: d1-aurora-a 26s ease-in-out infinite; }
+.d1-aurora__band--b { animation: d1-aurora-b 34s ease-in-out infinite; }
+.d1-aurora__band--c { animation: d1-aurora-c 44s ease-in-out infinite; }
+
+@keyframes d1-aurora-a {
+  0%, 100% { transform: translateX(-16px) scaleY(1); opacity: 0.75; }
+  50%      { transform: translateX(18px) scaleY(1.14); opacity: 1; }
+}
+
+@keyframes d1-aurora-b {
+  0%, 100% { transform: translateX(14px) scaleY(1.08); opacity: 0.55; }
+  50%      { transform: translateX(-18px) scaleY(0.94); opacity: 0.95; }
+}
+
+@keyframes d1-aurora-c {
+  0%, 100% { transform: translateX(10px) scaleY(0.96); opacity: 0.45; }
+  50%      { transform: translateX(-14px) scaleY(1.1); opacity: 0.8; }
+}
+
+.d1-star--twinkle {
+  animation: d1-twinkle 3.6s ease-in-out infinite;
+}
+
+@keyframes d1-twinkle {
+  0%, 100% { opacity: 0.25; }
+  45%      { opacity: 1; }
+}
+
+.d1-moonglow {
+  transform-origin: 322px 6px;
+  animation: d1-breathe-glow 9s ease-in-out infinite;
+}
+
+@keyframes d1-breathe-glow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%      { transform: scale(1.1); opacity: 1; }
+}
+
+.d1-window { animation: d1-lamp 5.5s ease-in-out infinite; }
+.d1-windowglow { animation: d1-lamp 5.5s ease-in-out infinite; }
+
+@keyframes d1-lamp {
+  0%, 100% { opacity: 0.82; }
+  50%      { opacity: 1; }
+}
+
+.d1-fairy { animation: d1-fairy 2.4s ease-in-out infinite; }
+
+@keyframes d1-fairy {
+  0%, 100% { opacity: 0.16; }
+  50%      { opacity: 0.55; }
+}
+
+/* Parallax is applied as an SVG transform attribute from Day01.jsx —
+   CSS transforms do not take on these groups. Nothing to do here. */
+
+/* ── Inside: firelight, tree and presents ────────────────────────── */
+
+/* transform-box: fill-box is the whole fix here. Without it an SVG
+   element's transform-origin resolves against the viewBox, not the
+   shape, so "scale from the bottom" scaled from somewhere off-screen
+   and the flames appeared not to animate at all. */
+.d1-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.d1-flame--outer { animation: d1-flicker 1.5s ease-in-out infinite; }
+.d1-flame--mid   { animation: d1-flicker 1.1s ease-in-out infinite reverse; }
+.d1-flame--core  { animation: d1-flicker 0.8s ease-in-out infinite; }
+.d1-fireglow {
+  transform-box: fill-box;
+  transform-origin: 50% 70%;
+  animation: d1-fireglow 2.4s ease-in-out infinite;
+}
+
+@keyframes d1-flicker {
+  0%, 100% { transform: scaleY(1) scaleX(1) translateX(0); opacity: 0.92; }
+  22%      { transform: scaleY(1.22) scaleX(0.9) translateX(-0.6px); opacity: 1; }
+  48%      { transform: scaleY(0.9) scaleX(1.09) translateX(0.5px); opacity: 0.84; }
+  74%      { transform: scaleY(1.12) scaleX(0.96) translateX(0.3px); opacity: 0.98; }
+}
+
+@keyframes d1-fireglow {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 0.72; transform: scale(1.06); }
+}
+
+.d1-candle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: d1-candleflicker 1.3s ease-in-out infinite;
+}
+
+@keyframes d1-candleflicker {
+  0%, 100% { transform: scaleY(1) scaleX(1) rotate(0deg); opacity: 0.9; }
+  30%      { transform: scaleY(1.25) scaleX(0.88) rotate(-4deg); opacity: 1; }
+  60%      { transform: scaleY(0.88) scaleX(1.1) rotate(3deg); opacity: 0.82; }
+}
+
+.d1-bauble { animation: d1-shimmer 4.5s ease-in-out infinite; }
+
+@keyframes d1-shimmer {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+.d1-treelight { animation: d1-fairy 3s ease-in-out infinite; }
+
+/* Presents react when you poke them. */
+.d1-present {
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transition: transform 180ms ease;
+}
+
+.d1-present:hover { transform: translateY(-2px) scale(1.03); }
+.d1-present--wiggle { animation: d1-wiggle 620ms ease-in-out; }
+
+@keyframes d1-wiggle {
+  0%   { transform: rotate(0deg) translateY(0); }
+  20%  { transform: rotate(-7deg) translateY(-5px); }
+  45%  { transform: rotate(6deg) translateY(-2px); }
+  70%  { transform: rotate(-4deg) translateY(-3px); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d1-aurora__band,
+  .d1-star--twinkle,
+  .d1-moonglow,
+  .d1-window,
+  .d1-windowglow,
+  .d1-fairy,
+  .d1-flame--outer,
+  .d1-flame--mid,
+  .d1-flame--core,
+  .d1-fireglow,
+  .d1-candle,
+  .d1-bauble,
+  .d1-treelight,
+  .d1-present--wiggle {
+    animation: none;
+  }
+
+  .d1-present:hover { transform: none; }
+}
+
+/* The aurora's own halo, and the reindeer's nose, both breathe. */
+.d1-aurglow {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: d1-aurglow 14s ease-in-out infinite;
+}
+
+@keyframes d1-aurglow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.12); }
+}
+
+.d1-nose {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: d1-nose 2.8s ease-in-out infinite;
+}
+
+@keyframes d1-nose {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50%      { opacity: 0.75; transform: scale(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d1-aurglow,
+  .d1-nose { animation: none; }
+}
+
+/* ── Layers of wrapping ──────────────────────────────────────────── */
+
+.scratch {
+  min-height: 190px;
+}
+
+.scratch__content {
+  padding: 20px 22px;
+  min-height: 190px;
+  gap: 2px;
+  justify-content: space-between;
+}
+
+.scratch__part {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+}
+
+.scratch__order {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9c7a3e;
+}
+
+.scratch__text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #35402f;
+}
+
+.scratch__rule {
+  width: 60%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg, #cdbb94 0 6px, transparent 6px 12px
+  );
+}
+
+/* The foil only hides the second half, so once the paper is off you
+   can see there is more to come. */
+.scratch__cover--foil {
+  top: auto;
+  bottom: 0;
+  height: 52%;
+}
+
+.scratch__cover--paper {
+  inset: 0;
+  height: 100%;
+}
+
+.scratch__more {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #9c7a3e;
+  animation: d1-nudge 1.4s ease-in-out infinite;
+}
+
+@keyframes d1-nudge {
+  0%, 100% { transform: translateY(0); opacity: 0.75; }
+  50%      { transform: translateY(2px); opacity: 1; }
+}
+
+.scratch__confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scratch__confetti span {
+  position: absolute;
+  top: -10px;
+  width: 7px;
+  height: 11px;
+  border-radius: 1px;
+  animation: d1-confetti 1.5s ease-in forwards;
+}
+
+@keyframes d1-confetti {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(210px) rotate(420deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scratch__more,
+  .scratch__confetti span { animation: none; }
+}
+
+/* ── The peel ────────────────────────────────────────────────────── */
+
+.peel {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: grab;
+  touch-action: none; /* so dragging peels instead of scrolling the page */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(240, 213, 140, 0.55) 0 7px,
+      transparent 7px 28px
+    ),
+    linear-gradient(135deg, #d14a3c 0%, #b83a30 50%, #8f2a24 100%);
+}
+
+.peel:active { cursor: grabbing; }
+
+/* A sheen, so the paper looks glossy rather than flat. */
+.peel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 55%);
+  pointer-events: none;
+}
+
+.peel__label {
+  position: relative;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff6e2;
+  text-shadow: 0 2px 6px rgba(80, 18, 14, 0.7);
+  pointer-events: none;
+}
+
+/* A turned-up corner, so it is obvious where to start. */
+.peel__dogear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(225deg, #fdf0d6 0%, #e2c6a0 55%, #b38d63 100%);
+  clip-path: polygon(100% 0, 0 0, 100% 100%);
+  box-shadow: -2px 2px 6px rgba(60, 14, 10, 0.4);
+  animation: d1-dogear 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes d1-dogear {
+  0%, 100% { opacity: 0.75; transform: translate(0, 0); }
+  50%      { opacity: 1; transform: translate(-2px, 2px); }
+}
+
+/* The paper curling back along the fold. */
+.peel__fold {
+  position: absolute;
+  top: 0;
+  height: 30px;
+  z-index: 5;
+  transform-origin: 0 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(255, 246, 226, 0.97) 0%,
+    rgba(232, 204, 166, 0.92) 30%,
+    rgba(160, 118, 86, 0.6) 66%,
+    rgba(90, 60, 40, 0) 100%
+  );
+  box-shadow: 0 3px 14px rgba(40, 10, 6, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peel__dogear { animation: none; }
 }

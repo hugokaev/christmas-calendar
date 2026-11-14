@@ -1,232 +1,249 @@
-// 1 December — spin the press-up wheel.
+// 1 December — the grand opening.
 //
-// Eight kinds of press-up, each with its own number from 5 to 50.
-// The harder the variation, the lower the number it can roll.
+// Tap the advent door, cross the snow to the cabin, click its door to
+// go inside, then scratch the frost off the card to find the challenge.
 //
-// The numbers are generated from the day itself, not from Math.random(),
-// so the wheel is identical for both of you and refreshing the page
-// cannot reroll it into something easier.
+// The landscape is in day01-scene.jsx, the room in day01-interior.jsx,
+// and the scratch panel in day01-scratch.jsx. Their filenames
+// deliberately do not look like "Day01.jsx", so the day-finder in
+// index.js ignores them.
 //
-// You can override the whole thing from Editor -> 1 December. Put one
-// option per line in the Text box, or use structured data:
-//
-//   { "options": ["10 burpees", "Sing a carol"] }
-import { useMemo, useState } from 'react'
+// The challenge text comes from Editor -> 1 December. Until something
+// is saved there it shows a placeholder.
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Day01Scene, { PaintedDoor } from './day01-scene.jsx'
+import Interior from './day01-interior.jsx'
+import ScratchCard from './day01-scratch.jsx'
 import './Day01.css'
 
-// Harder variations roll smaller numbers. 1 = the full 5-50 range.
-const PRESS_UP_TYPES = [
-  { name: 'standard', hardness: 1 },
-  { name: 'wide-arm', hardness: 1 },
-  { name: 'incline', hardness: 0.95 },
-  { name: 'decline', hardness: 0.8 },
-  { name: 'diamond', hardness: 0.7 },
-  { name: 'pike', hardness: 0.6 },
-  { name: 'clap', hardness: 0.45 },
-  { name: 'one-hand', hardness: 0.3 },
-]
-
-// A small predictable random generator. Given the same seed it always
-// produces the same sequence, which is what keeps the wheel stable.
-function seededRandom(seed) {
-  let state = seed + 0x6d2b79f5
-  return function next() {
-    state += 0x6d2b79f5
-    let result = Math.imul(state ^ (state >>> 15), 1 | state)
-    result ^= result + Math.imul(result ^ (result >>> 7), 61 | result)
-    return ((result ^ (result >>> 14)) >>> 0) / 4294967296
-  }
+function prefersStillness() {
+  return Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
 }
 
-// Work out a point on a circle. Angles start at the top and go clockwise.
-function pointOn(radius, angle) {
-  const radians = ((angle - 90) * Math.PI) / 180
-  return [150 + radius * Math.cos(radians), 150 + radius * Math.sin(radians)]
-}
+// ── Snow ────────────────────────────────────────────────────────────
 
-// One pie slice of the wheel.
-function slicePath(startAngle, endAngle) {
-  const [x1, y1] = pointOn(130, startAngle)
-  const [x2, y2] = pointOn(130, endAngle)
-  const bigArc = endAngle - startAngle > 180 ? 1 : 0
-  return `M 150 150 L ${x1} ${y1} A 130 130 0 ${bigArc} 1 ${x2} ${y2} Z`
-}
+function Snowfall() {
+  const canvasRef = useRef(null)
 
-export default function Day01({ day = 1, secret }) {
-  const [rotation, setRotation] = useState(0)
-  const [spinning, setSpinning] = useState(false)
-  const [landedOn, setLandedOn] = useState(null)
-  const [pending, setPending] = useState(null)
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const stillPlease = prefersStillness()
 
-  const options = useMemo(() => {
-    // Anything saved in the editor wins.
-    const structured = secret?.data?.options
-    if (Array.isArray(structured) && structured.length > 1) {
-      return structured.map((option) => ({
-        count: String(option),
-        type: '',
-        label: String(option),
+    let flakes = []
+    let frameId = null
+
+    function resize() {
+      const ratio = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * ratio
+      canvas.height = window.innerHeight * ratio
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+    }
+
+    function makeFlakes() {
+      const count = Math.max(40, Math.round(window.innerWidth / 11))
+      flakes = Array.from({ length: count }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: 0.8 + Math.random() * 2.4,
+        fall: 0.25 + Math.random() * 1.15,
+        drift: (Math.random() - 0.5) * 0.5,
+        alpha: 0.35 + Math.random() * 0.6,
+        wobble: Math.random() * Math.PI * 2,
       }))
     }
 
-    const lines = (secret?.instructions ?? '')
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-
-    if (lines.length > 1) {
-      return lines.map((line) => ({ count: line, type: '', label: line }))
-    }
-
-    // Otherwise: the press-up wheel.
-    const random = seededRandom(day * 7919)
-    return PRESS_UP_TYPES.map(({ name, hardness }) => {
-      const count = 5 + Math.round(45 * random() * hardness)
-      return {
-        count: String(count),
-        type: name,
-        label: `${count} ${name} press-ups`,
+    function draw() {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+      ctx.fillStyle = '#ffffff'
+      for (const flake of flakes) {
+        ctx.globalAlpha = flake.alpha
+        ctx.beginPath()
+        ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2)
+        ctx.fill()
       }
-    })
-  }, [secret, day])
-
-  const sliceAngle = options.length > 0 ? 360 / options.length : 0
-
-  function spin() {
-    if (spinning || options.length < 2) return
-
-    const pick = Math.floor(Math.random() * options.length)
-    const middleOfSlice = pick * sliceAngle + sliceAngle / 2
-
-    // Land with the chosen slice at the top, after a few full turns.
-    // Always rotate forwards so it never rewinds.
-    const base = Math.ceil(rotation / 360) * 360
-    const target = base + 360 * 5 + (360 - middleOfSlice)
-
-    const reduceMotion = window.matchMedia?.(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
-
-    setLandedOn(null)
-    setPending(pick)
-
-    if (reduceMotion) {
-      setRotation(target)
-      setLandedOn(pick)
-      return
+      ctx.globalAlpha = 1
     }
 
-    setSpinning(true)
-    setRotation(target)
+    function step(time) {
+      for (const flake of flakes) {
+        flake.y += flake.fall
+        flake.x += flake.drift + Math.sin(time / 1400 + flake.wobble) * 0.35
+        if (flake.y > window.innerHeight + 6) {
+          flake.y = -6
+          flake.x = Math.random() * window.innerWidth
+        }
+        if (flake.x < -6) flake.x = window.innerWidth + 6
+        if (flake.x > window.innerWidth + 6) flake.x = -6
+      }
+      draw()
+      frameId = requestAnimationFrame(step)
+    }
+
+    function restart() {
+      resize()
+      makeFlakes()
+      draw()
+    }
+
+    restart()
+    if (!stillPlease) frameId = requestAnimationFrame(step)
+
+    window.addEventListener('resize', restart)
+    return () => {
+      window.removeEventListener('resize', restart)
+      if (frameId) cancelAnimationFrame(frameId)
+    }
+  }, [])
+
+  return <canvas className="day01__snow" ref={canvasRef} aria-hidden="true" />
+}
+
+// ── The day ─────────────────────────────────────────────────────────
+
+export default function Day01({ day = 1, secret }) {
+  // closed -> opening -> outside -> inside
+  const [phase, setPhase] = useState('closed')
+  const rootRef = useRef(null)
+  const [revealed, setRevealed] = useState(false)
+
+  function openTheDoor() {
+    if (phase !== 'closed') return
+    setPhase(prefersStillness() ? 'outside' : 'opening')
   }
 
-  function finishedSpinning() {
-    setSpinning(false)
-    if (pending !== null) setLandedOn(pending)
-  }
+  useEffect(() => {
+    if (phase !== 'opening') return
+    const timer = setTimeout(() => setPhase('outside'), 1500)
+    return () => clearTimeout(timer)
+  }, [phase])
+
+  // Follow the pointer, so the layers of the landscape shift against
+  // one another and the picture gains depth.
+  //
+  // This sets the SVG transform ATTRIBUTE rather than a CSS transform:
+  // CSS transforms turned out not to apply to these groups at all, even
+  // set inline. The attribute works in user units, and a small easing
+  // loop keeps the movement smooth instead of snapping.
+  useEffect(() => {
+    if (prefersStillness()) return
+    const root = rootRef.current
+    if (!root) return
+
+    const layers = [
+      ['.d1-par--sky', 2],
+      ['.d1-par--far', 4],
+      ['.d1-par--mid', 8],
+      ['.d1-par--near', 13],
+      ['.d1-par--front', 19],
+    ]
+      .map(([selector, depth]) => [root.querySelector(selector), depth])
+      .filter(([element]) => element)
+
+    if (layers.length === 0) return
+
+    let targetX = 0
+    let targetY = 0
+    let currentX = 0
+    let currentY = 0
+    let frameId = null
+
+    function move(event) {
+      targetX = -((event.clientX / window.innerWidth) * 2 - 1)
+      targetY = -((event.clientY / window.innerHeight) * 2 - 1)
+    }
+
+    function leave() {
+      targetX = 0
+      targetY = 0
+    }
+
+    function frame() {
+      currentX += (targetX - currentX) * 0.07
+      currentY += (targetY - currentY) * 0.07
+      for (const [element, depth] of layers) {
+        element.setAttribute(
+          'transform',
+          `translate(${(currentX * depth).toFixed(2)} ${(currentY * depth * 0.4).toFixed(2)})`,
+        )
+      }
+      frameId = requestAnimationFrame(frame)
+    }
+
+    window.addEventListener('pointermove', move, { passive: true })
+    window.addEventListener('pointerleave', leave)
+    frameId = requestAnimationFrame(frame)
+
+    return () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerleave', leave)
+      if (frameId) cancelAnimationFrame(frameId)
+    }
+  }, [phase])
+
+  const goInside = useCallback(() => setPhase('inside'), [])
+  const onRevealed = useCallback(() => setRevealed(true), [])
+
+  // Two parts, one per layer of wrapping. Lines saved in the editor
+  // win; otherwise these are the day's challenge.
+  const saved = (secret?.instructions ?? '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  const parts = saved.length >= 2 ? saved.slice(0, 2) : ['Some stretching', 'A 2km run']
+
+  const inside = phase === 'inside'
 
   return (
-    <article className="day01">
-      {/* Nothing is shown unless you put it here. A title only appears
-          if you have saved one under Editor -> 1 December. */}
-      {secret?.title && <h2 className="day01__title">{secret.title}</h2>}
+    <div className={`day01 day01--${phase}`} ref={rootRef}>
+      {!inside && <Snowfall />}
 
-      {options.length < 2 ? (
-        <p className="day01__empty">This wheel needs at least two options.</p>
+      {!inside ? (
+        <>
+          <Day01Scene onEnter={goInside} />
+          <main className="day01__inside">
+            <p className="day01__prompt">Knock on the cabin door</p>
+          </main>
+        </>
       ) : (
         <>
-          <div className="day01__stage">
-            <div className="day01__pointer" aria-hidden="true" />
+          <Interior />
+          <main className="day01__room">
+            <p className="day01__cheer">
+              {revealed ? 'Happy 1st of December!' : 'Unwrap your challenge'}
+            </p>
 
-            <div
-              className="day01__wheel"
-              style={{ transform: `rotate(${rotation}deg)` }}
-              onTransitionEnd={finishedSpinning}
-            >
-              <svg
-                viewBox="0 0 300 300"
-                role="img"
-                aria-label={`Wheel of ${options.length} press-up challenges`}
-              >
-                {options.map((option, index) => {
-                  const start = index * sliceAngle
-                  const middle = start + sliceAngle / 2
+            <ScratchCard parts={parts} onRevealed={onRevealed} />
 
-                  // Without this, labels on the bottom half come out
-                  // upside down. Flip them so every one reads normally.
-                  const upsideDown = middle > 90 && middle < 270
-                  const flip = upsideDown ? 180 : 0
-
-                  const [countX, countY] = pointOn(option.type ? 96 : 84, middle)
-                  const [typeX, typeY] = pointOn(68, middle)
-
-                  return (
-                    <g key={index}>
-                      <path
-                        d={slicePath(start, start + sliceAngle)}
-                        fill={index % 2 === 0 ? '#ffffff' : '#f2f2f2'}
-                        stroke="#000000"
-                        strokeWidth="1"
-                      />
-
-                      <text
-                        x={countX}
-                        y={countY}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize={option.type ? 15 : 10}
-                        fontWeight={option.type ? 600 : 400}
-                        transform={`rotate(${middle + flip} ${countX} ${countY})`}
-                      >
-                        {option.type
-                          ? option.count
-                          : option.count.length > 16
-                            ? `${option.count.slice(0, 15)}…`
-                            : option.count}
-                      </text>
-
-                      {option.type && (
-                        <text
-                          x={typeX}
-                          y={typeY}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fontSize="9"
-                          transform={`rotate(${middle + flip} ${typeX} ${typeY})`}
-                        >
-                          {option.type}
-                        </text>
-                      )}
-                    </g>
-                  )
-                })}
-
-                <circle cx="150" cy="150" r="130" fill="none" stroke="#000" strokeWidth="1.5" />
-                <circle cx="150" cy="150" r="6" fill="#000000" />
-              </svg>
-            </div>
-          </div>
-
-          <button
-            className="button day01__spin"
-            type="button"
-            onClick={spin}
-            disabled={spinning}
-          >
-            {spinning ? 'Spinning…' : 'Spin the wheel'}
-          </button>
-
-          <p className="day01__result" aria-live="polite">
-            {landedOn !== null ? (
-              <>
-                You got: <strong>{options[landedOn].label}</strong>
-              </>
-            ) : (
-              ' '
-            )}
-          </p>
+            <button className="day01__back" type="button" onClick={() => setPhase('outside')}>
+              Back outside
+            </button>
+          </main>
         </>
       )}
-    </article>
+
+      {phase !== 'open' && phase !== 'outside' && phase !== 'inside' && (
+        <button
+          className="day01__doors"
+          type="button"
+          onClick={openTheDoor}
+          aria-label="Open the first door"
+        >
+          <span className="day01__door day01__door--left" aria-hidden="true">
+            <PaintedDoor side="left" />
+          </span>
+          <span className="day01__door day01__door--right" aria-hidden="true">
+            <PaintedDoor side="right" />
+          </span>
+
+          <span className="day01__plaque">
+            <span className="day01__numeral">1</span>
+            <span className="day01__month">December</span>
+            <span className="day01__hint">tap to open</span>
+          </span>
+        </button>
+      )}
+    </div>
   )
 }
