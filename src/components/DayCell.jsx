@@ -1,25 +1,24 @@
-// One square in the grid.
+// One stop on the trail.
 //
-// A square you can open is a link. One you cannot is plain text.
+// A stop you can open is a link. One you cannot is plain text.
 // Nothing else is ever shown here but the date number.
+// Calendar.jsx decides where the stop sits and how big it is (style).
 import { Link } from 'react-router-dom'
 import './DayCell.css'
 
-export default function DayCell({ day, open, to }) {
-  if (day === null) {
-    return <div className="day day--empty" aria-hidden="true" />
-  }
+export default function DayCell({ day, open, to, final, style }) {
+  const className = `day ${open ? 'day--open' : 'day--locked'}${final ? ' day--final' : ''}`
 
   if (!open) {
     return (
-      <div className="day day--locked" aria-label={`${day} December`}>
+      <div className={className} style={style} aria-label={`${day} December`}>
         <span className="day__number">{day}</span>
       </div>
     )
   }
 
   return (
-    <Link className="day day--open" to={to} aria-label={`${day} December`}>
+    <Link className={className} style={style} to={to} aria-label={`${day} December`}>
       <span className="day__number">{day}</span>
     </Link>
   )

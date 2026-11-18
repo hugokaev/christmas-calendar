@@ -1,50 +1,55 @@
 /*
-  One day square.
-  aspect-ratio keeps every square the same shape as the screen gets wider.
-  The white background covers the black grid behind it, leaving only
-  the 1px gaps showing as lines.
+  One square stop on the trail. Its position and width come from
+  Calendar.jsx; it is centred on that point. The white fill hides the
+  trail where it passes underneath.
 */
 .day {
-  background: #ffffff;
+  position: absolute;
+  transform: translate(-50%, -50%);
   aspect-ratio: 1 / 1;
-  padding: 4px;
-  min-height: 44px;
-}
-
-/* A padding square before the 1st or after the 31st. */
-.day--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #ffffff;
+  border: 3px solid #000000;
 }
 
-/* The date number, sitting in the top-left corner. */
 .day__number {
-  display: block;
-  font-size: 0.8125rem;
+  font-size: 6cqw;
+  font-weight: 600;
   line-height: 1;
 }
 
-@media (min-width: 700px) {
-  .day {
-    padding: 8px;
-    min-height: 72px;
-  }
+/* Christmas Day: the treasure at the end of the trail. */
+.day--final {
+  border: 7px double #000000;
+}
 
-  .day__number {
-    font-size: 0.9375rem;
-  }
+.day--final .day__number {
+  font-size: 13cqw;
+  font-weight: 700;
 }
 
 /*
   A day that has not unlocked yet. Still just a number, only quieter,
-  so it is obvious which squares can be opened.
+  so it is obvious which stops can be opened.
 */
+.day--locked {
+  border-style: dashed;
+  border-color: #9b9b9b;
+  cursor: default;
+}
+
+.day--locked.day--final {
+  border-style: double;
+}
+
 .day--locked .day__number {
   color: #9b9b9b;
 }
 
 /* A day that has unlocked, and is therefore a link. */
 .day--open {
-  display: block;
   color: inherit;
   text-decoration: none;
 }
@@ -52,9 +57,4 @@
 .day--open:hover,
 .day--open:focus-visible {
   background: #f2f2f2;
-}
-
-/* Locked squares are not clickable, so do not pretend otherwise. */
-.day--locked {
-  cursor: default;
 }
