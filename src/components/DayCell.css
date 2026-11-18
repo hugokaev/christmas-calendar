@@ -58,3 +58,49 @@
 .day--open:focus-visible {
   background: #f2f2f2;
 }
+
+/*
+  A day with its own picture (src/boxArt.js). The picture fills the box
+  and stays crisp when scaled up. The number is white with a dark outline
+  so it reads on top of any picture, locked or not.
+*/
+.day--art {
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+  border-style: solid;
+  border-color: #000000;
+}
+
+.day--art .day__number,
+.day--art.day--locked .day__number {
+  color: #ffffff;
+  text-shadow:
+    0 0 3px #000000,
+    0 0 1px #000000;
+}
+
+.day--art.day--open:hover,
+.day--art.day--open:focus-visible {
+  filter: brightness(1.1);
+}
+
+/*
+  Every tile grows a little under the mouse (or when tabbed to),
+  and rises above its neighbours while it does.
+*/
+.day {
+  transition: transform 0.18s ease;
+}
+
+.day:hover,
+.day:focus-visible {
+  transform: translate(-50%, -50%) scale(1.08);
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day {
+    transition: none;
+  }
+}
