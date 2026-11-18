@@ -1,0 +1,198 @@
+/*
+  Day 2. The stage is built from layers cut out of the 64 × 64 picture,
+  so every position below is "pixels out of 64" turned into a percentage.
+*/
+.day02 {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 56px 16px 32px;
+  /*
+    A dark theatre: a warm spotlight glowing behind the stage, soft
+    shadow falling off towards the edges, and faint velvet folds
+    running down the walls.
+  */
+  background:
+    radial-gradient(ellipse 55% 60% at 50% 45%, rgba(150, 40, 70, 0.28), transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 40%, transparent 40%, rgba(0, 0, 0, 0.75) 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0) 28px,
+      rgba(0, 0, 0, 0.18) 56px,
+      rgba(255, 255, 255, 0) 84px,
+      rgba(255, 255, 255, 0.025) 112px
+    ),
+    linear-gradient(180deg, #24121a 0%, #160b10 60%, #0b0709 100%);
+  background-attachment: fixed;
+  color: #e8e8e8;
+  user-select: none;
+}
+
+.day02__stage {
+  position: relative;
+  width: min(80vh, calc(100vw - 240px));
+  aspect-ratio: 1 / 1;
+  border: 4px solid #3a2f33;
+  overflow: hidden;
+  /* Lit from the front, so it glows a little and casts a shadow. */
+  box-shadow:
+    0 0 60px rgba(200, 60, 90, 0.18),
+    0 24px 48px rgba(0, 0, 0, 0.6);
+  background: #171717;
+}
+
+.day02__layer {
+  position: absolute;
+  display: block;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* What is behind the curtains: rows 12 to 58. */
+.day02__screen {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 18.75%; /* 12 / 64 */
+  height: 73.4375%; /* 47 / 64 */
+  background: #171717;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day02__video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: contain;
+  background: #000000;
+}
+
+.day02__empty {
+  margin: 0;
+  color: #8a8a8a;
+  font-size: 0.875rem;
+}
+
+/*
+  The two curtain halves, each bunching towards its own side. They start
+  at row 11, tucked behind the black line, so the red shows through the
+  line's little gaps while the curtains are closed.
+*/
+.day02__curtain {
+  top: 17.1875%; /* 11 / 64 */
+  height: 75%; /* 48 / 64 */
+  width: 50%;
+  transition: transform 0.9s ease-out;
+}
+
+.day02__curtain--left {
+  left: 0;
+  transform-origin: left center;
+}
+
+.day02__curtain--right {
+  right: 0;
+  transform-origin: right center;
+}
+
+/* The stage floor: rows 59 to 63. */
+.day02__floor {
+  left: 0;
+  width: 100%;
+  top: 92.1875%; /* 59 / 64 */
+  height: 7.8125%; /* 5 / 64 */
+}
+
+/* The garland and pelmet, with holly trailing down the right: rows 0 to 24. */
+.day02__top {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 39.0625%; /* 25 / 64 */
+}
+
+/* The crank, beside the stage. */
+.day02__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.day02__crank {
+  width: 160px;
+  aspect-ratio: 1 / 1;
+  cursor: grab;
+  touch-action: none;
+  image-rendering: pixelated;
+}
+
+.day02__crank:active {
+  cursor: grabbing;
+}
+
+.day02__crank:focus-visible {
+  outline: 2px dashed #e8e8e8;
+  outline-offset: 4px;
+}
+
+.day02__crank svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.day02__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #9a9a9a;
+  transition: opacity 0.4s ease;
+}
+
+.day02__hint--gone {
+  opacity: 0;
+}
+
+/* Phones and narrow windows: crank goes underneath the stage. */
+@media (max-width: 699px) {
+  .day02 {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .day02__stage {
+    width: min(calc(100vw - 32px), 64vh);
+  }
+
+  .day02__crank {
+    width: 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day02__curtain {
+    transition: none;
+  }
+}
+
+/*
+  The site's back arrow is black, which would vanish on this dark page.
+  :has() keeps this to day 2 only, even though this CSS stays loaded.
+*/
+body:has(.day02) {
+  background: #0e0b0d;
+}
+
+body:has(.day02) .backarrow {
+  color: #e8e8e8;
+}
+
+body:has(.day02) .backarrow:hover,
+body:has(.day02) .backarrow:focus-visible {
+  background: #2a2427;
+}
