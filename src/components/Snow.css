@@ -1,0 +1,14 @@
+/*
+  Covers the whole screen, BEHIND the page content (z-index -1), so the
+  white boxes hide the snow as it passes. This works because .page in
+  index.css is isolated: the snow stays above the white body background
+  but below everything on the page. It never catches a click.
+*/
+.snow {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+}

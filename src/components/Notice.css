@@ -12,6 +12,7 @@
   color: #000000;
   border: 1px solid #000000;
   padding: 10px 12px;
+  background: #ffffff; /* so falling snow passes behind it */
 }
 
 .notice--success {

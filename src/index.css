@@ -31,6 +31,9 @@ a {
   max-width: 900px;
   margin: 0 auto;
   padding: 24px 16px 48px;
+  /* Its own layer, so the falling snow (z-index -1) sits behind the
+     page's content but still in front of the white background. */
+  isolation: isolate;
 }
 
 @media (min-width: 700px) {
